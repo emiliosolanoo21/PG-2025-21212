@@ -1,0 +1,77 @@
+env:
+  vars:
+    BASE_URL: "https://santaana-api-latest.onrender.com"
+    OPENAPI_URL: "${BASE_URL}/docs-json"   # Swagger JSON de Nest por defecto
+  contexts:
+    - name: "api"
+      urls: ["${BASE_URL}"]
+      includePaths:
+        - "${BASE_URL}/.*"
+
+      # 1) Login JSON (POST) para obtener el token
+      authentication:
+        method: "json"
+        parameters:
+          loginPageUrl:  "${BASE_URL}/auth/login"        # si tu login no requiere "preload", puede omitirse
+          loginRequestUrl: "${BASE_URL}/auth/login"       # AJUSTA a tu endpoint real de login
+          loginRequestBody: '{"username":"{%username%}","password":"{%password%}"}'
+        verification:
+          method: "response"
+          # Basta con que en la respuesta del login aparezca uno de estos campos
+          loggedInRegex: '"access_token"|"token"|"jwt"'
+
+      # 2) Inyectar headers en TODAS las requests usando el token del JSON
+      sessionManagement:
+        method: "headers"
+        parameters:
+          Authorization: "Bearer {%json:access_token%}"   # path JSON: ajusta si tu campo es "token" o "jwt"
+          x-api-key: "${API_KEY_VALUE}"
+
+      users:
+        - name: "tester"
+          credentials:
+            username: "${ZAP_AUTH_USERNAME}"
+            password: "${ZAP_AUTH_PASSWORD}"
+
+  parameters:
+    failOnError: true
+    failOnWarning: false
+    progressToStdout: true
+
+jobs:
+  # Importa tu OpenAPI (OAS 3.x)
+  - type: "openapi"
+    parameters:
+      apiUrl:   "${OPENAPI_URL}"
+      context:  "api"
+      user:     "tester"
+      targetUrl: "${BASE_URL}"
+
+  # Espera a que termine el pasivo mientras se generan alerts
+  - type: "passiveScan-wait"
+    parameters:
+      maxDuration: 120
+
+  # Configuración básica del activo (sin policy custom para evitar "Unrecognised policy")
+  - type: "activeScan-config"
+    parameters:
+      maxRuleDurationInMins: 5
+      injectPluginIdInHeader: true
+
+  # Activo (DAST)
+  - type: "activeScan"
+    parameters:
+      context: "api"
+      user: "tester"
+
+  # Reporte HTML
+  - type: "report"
+    parameters:
+      template: "traditional-html"
+      reportDir: "/zap/wrk"
+      reportFile: "zap-report.html"
+
+  # Falla si hay alertas >= Medium
+  - type: "exitStatus"
+    parameters:
+      warnLevel: "Medium"

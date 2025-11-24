@@ -60,7 +60,7 @@ Para reproducir o adaptar parte del trabajo pueden ser útiles:
 
 4. **Variables de entorno**
 
-   * En este repositorio **no se requiere configurar variables de entorno adicionales** ni utilizar un archivo `.env.example`, ya que el foco está en la documentación y evidencias del trabajo de seguridad, QA y usabilidad, no en la ejecución de la API o del cliente móvil.
+   * En este repositorio **no se requiere configurar variables de entorno adicionales** ni utilizar un archivo `.env.example`, ya que el foco está en la documentación y evidencias del trabajo de seguridad, QA y usabilidad, no en la ejecución de la API o del cliente móvil. A pesar de ello, el archivo cuenta con las variables de entorno utilizadas para las pruebas realizadas mediante la herramienta ZAP. Se aclara que solamente la variable `API_BASE_URL` se utilizó en el desarrollo de este apartado.
 
 ## Demo
 
