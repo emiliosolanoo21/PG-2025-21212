@@ -90,5 +90,7 @@ El informe final del proyecto, donde se detalla la arquitectura general, la meto
 
 ## Licencia
 
-Este repositorio **no declara una licencia explícita**.
+Este proyecto se distribuye bajo la licencia MIT.
+© 2025 Ingenio Santa Ana · Universidad del Valle de Guatemala
+
 En caso de reutilizar o adaptar partes del trabajo, se recomienda coordinarlo con los responsables del proyecto original y con la universidad.
